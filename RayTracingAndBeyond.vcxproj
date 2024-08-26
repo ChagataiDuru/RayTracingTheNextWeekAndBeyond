@@ -24,7 +24,6 @@
     <ProjectGuid>{abd9cc33-1f90-4c32-9248-4a9234c51e6f}</ProjectGuid>
     <RootNamespace>RayTracingInOneWeekendImplementation</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>RayTracingAndBeyond</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
