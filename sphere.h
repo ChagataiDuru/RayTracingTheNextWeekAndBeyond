@@ -47,6 +47,12 @@ public:
         return true;
     }
 
+    void update(double time) override {
+        if (is_moving) {
+			center_vec = sphere_center(time) - center1;
+		}
+	}
+
 private:
     point3 center1;
     double radius;

@@ -24,6 +24,8 @@ public:
     virtual ~hittable() = default;
 
     virtual bool hit(const ray& r, interval ray_t, hit_record& rec) const = 0;
+
+    virtual void update(double time) = 0;
 };
 
 #endif

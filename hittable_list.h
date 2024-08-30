@@ -40,6 +40,12 @@ public:
 
         return hit_anything;
     }
+
+    void update(double time) override {
+        for (const auto& object : objects) {
+			object->update(time);
+		}
+	}
 };
 
 #endif

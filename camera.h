@@ -21,6 +21,9 @@ public:
     double defocus_angle = 0;  // Variation angle of rays through each pixel
     double focus_dist = 10;    // Distance from camera lookfrom point to plane of perfect focus
 
+        int total_frames = 1;
+    double frame_duration = 1.0 / 24.0; // Default to 24 fps
+    double shutter_duration = 1.0 / 48.0; // Default to half the frame duration
 
     void render(const hittable& world, uint8_t* pixels) {
         initialize();
@@ -35,11 +38,11 @@ public:
                 int index = (j * image_width + i) * 3;
 
                 // Gamma correction
-                pixel_color = color(linear_to_gamma(pixel_color.x()), linear_to_gamma(pixel_color.y()), linear_to_gamma(pixel_color.z()));
+                pixel_color = color(linear_to_gamma(pixel_samples_scale * pixel_color.x()), linear_to_gamma(pixel_samples_scale * pixel_color.y()), linear_to_gamma(pixel_samples_scale * pixel_color.z()));
 
-                pixels[index] = std::clamp((int)(255.999 * pixel_color.x() * pixel_samples_scale), 0, 255);
-                pixels[index + 1] = std::clamp((int)(255.999 * pixel_color.y() * pixel_samples_scale), 0, 255);
-                pixels[index + 2] = std::clamp((int)(255.999 * pixel_color.z() * pixel_samples_scale), 0, 255);
+                pixels[index] = std::clamp((int)(255.999 * pixel_color.x()), 0, 255);
+                pixels[index + 1] = std::clamp((int)(255.999 * pixel_color.y()), 0, 255);
+                pixels[index + 2] = std::clamp((int)(255.999 * pixel_color.z()), 0, 255);
             }
         }
 
@@ -128,6 +131,10 @@ private:
 
         return ray(ray_origin, ray_direction, ray_time);
     }
+
+    void update_world(hittable& world, double time) const {
+		//world.update(time);
+	}
 
     vec3 sample_square() const {
         // Returns the vector to a random point in the [-.5,-.5]-[+.5,+.5] unit square.

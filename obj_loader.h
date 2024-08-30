@@ -54,6 +54,8 @@ public:
         return false;
     }
 
+    void update(double time) override {};
+
 private:
     point3 vertex0, vertex1, vertex2;
     vec3 normal;
