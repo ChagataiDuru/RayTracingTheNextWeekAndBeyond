@@ -24,6 +24,10 @@ public:
         return max - min;
     }
 
+    constexpr double length() const noexcept {
+		return max - min;
+	}
+
     constexpr bool contains(double x) const noexcept {
         return min <= x && x <= max;
     }

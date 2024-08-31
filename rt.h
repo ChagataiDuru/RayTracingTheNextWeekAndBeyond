@@ -61,5 +61,6 @@ private:
 #include "interval.h"
 #include "ray.h"
 #include "vec3.h"
+#include "texture.h"
 
 #endif

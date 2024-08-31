@@ -13,8 +13,12 @@ public:
 
     bvh_node(const std::vector<shared_ptr<hittable>>& src_objects, size_t start, size_t end) {
         auto objects = src_objects; // Local copy of the objects
+        bbox = aabb::empty;
 
-        int axis = RandomGenerator::instance().random_int(0, 2);
+        for (size_t object_index = start; object_index < end; object_index++)
+            bbox = aabb(bbox, objects[object_index]->bounding_box());
+
+        int axis = bbox.longest_axis();
         const auto comparator = [axis](const auto& a, const auto& b) {
             return box_compare(a, b, axis);
             };
@@ -35,7 +39,7 @@ public:
             }
         }
         else {
-            // Use nth_element better performance we dont need to sort the whole list
+            // Used nth_element better performance we dont need to sort the whole list
             std::nth_element(objects.begin() + start,
                 objects.begin() + start + object_span / 2,
                 objects.begin() + end, comparator);

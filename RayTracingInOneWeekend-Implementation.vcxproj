@@ -166,6 +166,7 @@
     <ClInclude Include="ray.h" />
     <ClInclude Include="rt.h" />
     <ClInclude Include="sphere.h" />
+    <ClInclude Include="texture.h" />
     <ClInclude Include="vec3.h" />
     <ClInclude Include="camera.h" />
   </ItemGroup>

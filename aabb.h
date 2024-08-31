@@ -46,6 +46,21 @@ public:
         }
         return true;
     }
+
+    int longest_axis() const
+    {
+		auto longest = 0;
+        for (size_t i = 1; i < 3; ++i) {
+			if (intervals[i].length() > intervals[longest].length())
+				longest = i;
+		}
+		return longest;
+	}
+
+    static const aabb empty, universe;
 };
+
+const aabb aabb::empty = aabb(interval(0, 0), interval(0, 0), interval(0, 0));
+const aabb aabb::universe = aabb(interval(-infinity, infinity), interval(-infinity, infinity), interval(-infinity, infinity));
 
 #endif
