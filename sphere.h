@@ -66,6 +66,16 @@ public:
 		}
 	}
 
+    point3 center() const {
+        return center1;
+    }
+
+    void set_center(const point3& new_center) {
+        center1 = new_center;
+        auto rvec = vec3(radius, radius, radius);
+        bbox = aabb(center1 - rvec, center1 + rvec);
+    }
+
 private:
     point3 center1;
     double radius;
@@ -93,6 +103,39 @@ private:
 
         u = phi / (2 * pi);
         v = theta / pi;
+    }
+};
+
+class rotating_sphere : public hittable {
+public:
+    shared_ptr<sphere> globe;
+    double rotation_speed;
+
+    rotating_sphere(shared_ptr<sphere> globe, double rotation_speed)
+        : globe(globe), rotation_speed(rotation_speed) {}
+
+    bool hit(const ray& r, interval ray_t, hit_record& rec) const override {
+        return globe->hit(r, ray_t, rec);
+    }
+
+    void update(double time) override {
+        double angle = rotation_speed * time;
+        double radians = degrees_to_radians(angle);
+        double cos_r = cos(radians);
+        double sin_r = sin(radians);
+
+        // Apply rotation to the globe's center
+        point3 rotated_center(
+            globe->center().x() * cos_r - globe->center().z() * sin_r,
+            globe->center().y(),
+            globe->center().x() * sin_r + globe->center().z() * cos_r
+        );
+
+        globe->set_center(rotated_center);
+    }
+
+    aabb bounding_box() const override {
+        return globe->bounding_box();
     }
 };
 

@@ -125,12 +125,13 @@ void earth(SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* texture, int
     auto earth_texture = make_shared<image_texture>("earthmap.jpg");
     auto earth_surface = make_shared<lambertian>(earth_texture);
     auto globe = make_shared<sphere>(point3(0, 0, 0), 2, earth_surface);
+    auto rotating_globe = make_shared<rotating_sphere>(globe, 240.25);  // rotation degree per frame
 
     camera cam;
 
     cam.aspect_ratio = 16.0 / 9.0;
     cam.image_width = image_width;
-    cam.samples_per_pixel = 5;
+    cam.samples_per_pixel = 2;
     cam.max_depth = 50;
 
     cam.vfov = 20;
@@ -140,18 +141,13 @@ void earth(SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* texture, int
 
     cam.defocus_angle = 0;
 
-    cam.total_frames = 80;  // 10 seconds at 8 fps
+    std::vector<uint8_t> pixels(image_width * image_height * 3);
+
+    cam.total_frames = 240;  // 10 seconds at 24 fps
     cam.frame_duration = 1.0 / 24.0;  // 24 fps
     cam.shutter_duration = 1.0 / 48.0;  // Half the frame duration
 
-    std::vector<uint8_t> pixels(image_width * image_height * 3);
-
-    cam.render(hittable_list(globe), pixels.data());
-
-    SDL_UpdateTexture(texture, nullptr, pixels.data(), image_width * 3);
-    SDL_RenderClear(renderer);
-    SDL_RenderCopy(renderer, texture, nullptr, nullptr);
-    SDL_RenderPresent(renderer);
+    cam.render_sequence(hittable_list(rotating_globe), renderer, texture);
 }
 
 int main(int argc, char* argv[]) {
@@ -161,7 +157,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    int image_width = 800;
+    int image_width = 400;
     int image_height = int(image_width / (16.0 / 9.0));
 
     SDL_Window* window = SDL_CreateWindow("Ray Tracer", 100, 100, image_width, image_height, SDL_WINDOW_SHOWN);

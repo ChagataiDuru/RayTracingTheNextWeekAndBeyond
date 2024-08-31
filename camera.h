@@ -48,6 +48,57 @@ public:
 
     }
 
+
+    void render_sequence(const hittable& world, SDL_Renderer* renderer, SDL_Texture* texture) {
+        initialize();
+
+        std::vector<uint8_t> pixels(image_width * image_height * 3);
+
+        for (int frame = 0; frame < total_frames; ++frame) {
+            double frame_start_time = frame * frame_duration;
+            double frame_end_time = frame_start_time + shutter_duration;
+
+            // Update all objects in the world for this frame
+            update_world(world, frame_start_time);
+
+            for (int j = 0; j < image_height; ++j) {
+                for (int i = 0; i < image_width; ++i) {
+                    color pixel_color(0, 0, 0);
+                    for (int sample = 0; sample < samples_per_pixel; ++sample) {
+                        auto time = RandomGenerator::instance().random_double(frame_start_time, frame_end_time);
+                        ray r = get_ray(i, j, time);
+                        pixel_color += ray_color(r, max_depth, world);
+                    }
+
+                    int index = (j * image_width + i) * 3;
+
+                    // Gamma correction
+                    pixel_color = color(linear_to_gamma(pixel_samples_scale * pixel_color.x()), linear_to_gamma(pixel_samples_scale * pixel_color.y()), linear_to_gamma(pixel_samples_scale * pixel_color.z()));
+
+                    pixels[index] = std::clamp((int)(255.999 * pixel_color.x()), 0, 255);
+                    pixels[index + 1] = std::clamp((int)(255.999 * pixel_color.y()), 0, 255);
+                    pixels[index + 2] = std::clamp((int)(255.999 * pixel_color.z()), 0, 255);
+                }
+            }
+
+            // Update SDL texture and render
+            SDL_UpdateTexture(texture, nullptr, pixels.data(), image_width * 3);
+            SDL_RenderClear(renderer);
+            SDL_RenderCopy(renderer, texture, nullptr, nullptr);
+            SDL_RenderPresent(renderer);
+
+            SDL_Event event;
+            while (SDL_PollEvent(&event)) {
+                if (event.type == SDL_QUIT) {
+                    return;
+                }
+            }
+
+            // Add a small delay to control frame rate
+            SDL_Delay(static_cast<Uint32>(1000 * frame_duration));
+        }
+    }
+
 private:
     int    image_height;    // Rendered image height
     double pixel_samples_scale;  // Color scale factor for a sum of pixel samples
@@ -132,9 +183,26 @@ private:
         return ray(ray_origin, ray_direction, ray_time);
     }
 
-    void update_world(hittable& world, double time) const {
-		//world.update(time);
-	}
+    ray get_ray(int i, int j, double ray_time) const {
+        // Construct a camera ray originating from the origin and time directed from function arguments.
+
+        auto offset = sample_square();
+        auto pixel_sample = pixel00_loc
+            + ((i + offset.x()) * pixel_delta_u)
+            + ((j + offset.y()) * pixel_delta_v);
+
+        auto ray_origin = (defocus_angle <= 0) ? center : defocus_disk_sample();
+        auto ray_direction = pixel_sample - ray_origin;
+
+        return ray(ray_origin, ray_direction, ray_time);
+    }
+
+    void update_world(const hittable& world, double time) const {
+        const hittable_list& world_list = static_cast<const hittable_list&>(world);
+        for (const auto& object : world_list.objects) {
+            const_cast<hittable*>(object.get())->update(time);
+        }
+    }
 
     vec3 sample_square() const {
         // Returns the vector to a random point in the [-.5,-.5]-[+.5,+.5] unit square.
