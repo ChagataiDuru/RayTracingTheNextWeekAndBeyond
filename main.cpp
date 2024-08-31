@@ -98,7 +98,7 @@ void checkered_spheres(SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* 
 
     cam.aspect_ratio = 16.0 / 9.0;
     cam.image_width = image_width;
-    cam.samples_per_pixel = 100;
+    cam.samples_per_pixel = 5;
     cam.max_depth = 50;
 
     cam.vfov = 20;
@@ -118,6 +118,42 @@ void checkered_spheres(SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* 
     SDL_RenderPresent(renderer);
 }
 
+void earth(SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* texture, int image_width) {
+
+    int image_height = int(image_width / (16.0 / 9.0));
+
+    auto earth_texture = make_shared<image_texture>("earthmap.jpg");
+    auto earth_surface = make_shared<lambertian>(earth_texture);
+    auto globe = make_shared<sphere>(point3(0, 0, 0), 2, earth_surface);
+
+    camera cam;
+
+    cam.aspect_ratio = 16.0 / 9.0;
+    cam.image_width = image_width;
+    cam.samples_per_pixel = 5;
+    cam.max_depth = 50;
+
+    cam.vfov = 20;
+    cam.lookfrom = point3(0, 0, 12);
+    cam.lookat = point3(0, 0, 0);
+    cam.vup = vec3(0, 1, 0);
+
+    cam.defocus_angle = 0;
+
+    cam.total_frames = 80;  // 10 seconds at 8 fps
+    cam.frame_duration = 1.0 / 24.0;  // 24 fps
+    cam.shutter_duration = 1.0 / 48.0;  // Half the frame duration
+
+    std::vector<uint8_t> pixels(image_width * image_height * 3);
+
+    cam.render(hittable_list(globe), pixels.data());
+
+    SDL_UpdateTexture(texture, nullptr, pixels.data(), image_width * 3);
+    SDL_RenderClear(renderer);
+    SDL_RenderCopy(renderer, texture, nullptr, nullptr);
+    SDL_RenderPresent(renderer);
+}
+
 int main(int argc, char* argv[]) {
 
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -125,7 +161,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    int image_width = 400;
+    int image_width = 800;
     int image_height = int(image_width / (16.0 / 9.0));
 
     SDL_Window* window = SDL_CreateWindow("Ray Tracer", 100, 100, image_width, image_height, SDL_WINDOW_SHOWN);
@@ -152,9 +188,10 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    switch (2) {
+    switch (3) {
         case 1: bouncing_spheres(window,renderer,texture,image_width);  break;
         case 2: checkered_spheres(window, renderer, texture, image_width); break;
+        case 3: earth(window, renderer, texture, image_width); break;
     }
 
     SDL_Event e;

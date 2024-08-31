@@ -80,7 +80,7 @@ private:
         return center1 + time*center_vec;
     }
 
-    constexpr static void get_sphere_uv(const point3& p, double& u, double& v) {
+    static void get_sphere_uv(const point3& p, double& u, double& v) {
         // p: a given point on the sphere of radius one, centered at the origin.
         // u: returned value [0,1] of angle around the Y axis from X=-1.
         // v: returned value [0,1] of angle from Y=-1 to Y=+1.

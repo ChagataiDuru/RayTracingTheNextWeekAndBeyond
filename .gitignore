@@ -3,7 +3,7 @@
 /.vs
 /Build
 /Release
-
+stb_image.h
 # Compiled Object files
 *.slo
 *.lo

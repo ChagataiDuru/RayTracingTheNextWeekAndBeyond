@@ -48,6 +48,13 @@ public:
         auto padding = delta / 2;
         return interval(min - padding, max + padding);
     }
+
+    constexpr double clamp(double x) const noexcept {
+        if (x < min) return min;
+        if (x > max) return max;
+        return x;
+    }
+
 };
 
 #endif

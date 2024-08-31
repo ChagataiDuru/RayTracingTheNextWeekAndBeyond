@@ -165,7 +165,9 @@
     <ClInclude Include="obj_loader.h" />
     <ClInclude Include="ray.h" />
     <ClInclude Include="rt.h" />
+    <ClInclude Include="rt_stb_image.h" />
     <ClInclude Include="sphere.h" />
+    <ClInclude Include="stb_image.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="vec3.h" />
     <ClInclude Include="camera.h" />
