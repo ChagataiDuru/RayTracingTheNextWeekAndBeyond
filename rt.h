@@ -43,6 +43,11 @@ public:
         return dist(rng);
     }
 
+    int random_int(int min, int max) {
+        // Returns a random integer in [min,max].
+        return int(random_double(min, max + 1));
+    }
+
 private:
 
     RandomGenerator() : rng(std::random_device{}()), dist(0.0, 1.0) {}

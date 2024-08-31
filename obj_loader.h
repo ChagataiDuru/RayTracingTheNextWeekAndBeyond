@@ -54,6 +54,22 @@ public:
         return false;
     }
 
+    aabb bounding_box() const override {
+		point3 min = point3(
+			std::min({ vertex0.x(), vertex1.x(), vertex2.x() }),
+			std::min({ vertex0.y(), vertex1.y(), vertex2.y() }),
+			std::min({ vertex0.z(), vertex1.z(), vertex2.z() })
+		);
+
+		point3 max = point3(
+			std::max({ vertex0.x(), vertex1.x(), vertex2.x() }),
+			std::max({ vertex0.y(), vertex1.y(), vertex2.y() }),
+			std::max({ vertex0.z(), vertex1.z(), vertex2.z() })
+		);
+
+		return aabb(min, max);
+	}
+
     void update(double time) override {};
 
 private:

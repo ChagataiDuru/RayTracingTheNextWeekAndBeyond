@@ -2,6 +2,7 @@
 #define HITTABLE_H
 
 #include "rt.h"
+#include "aabb.h"
 
 class material;
 
@@ -26,6 +27,8 @@ public:
     virtual bool hit(const ray& r, interval ray_t, hit_record& rec) const = 0;
 
     virtual void update(double time) = 0;
+
+    virtual aabb bounding_box() const = 0;
 };
 
 #endif

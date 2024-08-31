@@ -14,6 +14,12 @@ public:
 
     constexpr interval(double _min, double _max) noexcept : min(_min), max(_max) {}
 
+    interval(const interval& a, const interval& b) {
+        // Create the interval tightly enclosing the two input intervals.
+        min = a.min <= b.min ? a.min : b.min;
+        max = a.max >= b.max ? a.max : b.max;
+    }
+
     constexpr double size() const noexcept {
         return max - min;
     }
@@ -32,6 +38,11 @@ public:
 
     static constexpr interval universe() noexcept {
         return interval(-infinity, +infinity);
+    }
+
+    constexpr interval expand(double delta) noexcept {
+        auto padding = delta / 2;
+        return interval(min - padding, max + padding);
     }
 };
 

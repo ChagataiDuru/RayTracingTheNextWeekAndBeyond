@@ -3,7 +3,7 @@
 
 #include "hittable.h"
 #include "rt.h"
-
+#include "aabb.h"
 
 #include <vector>
 
@@ -20,7 +20,8 @@ public:
     void clear() { objects.clear(); }
 
     void add(shared_ptr<hittable> object) {
-        objects.emplace_back(std::move(object)); object.reset();
+        objects.push_back(object);
+        bbox = aabb(bbox, object->bounding_box());
     }
 
     void reserve(size_t n) { objects.reserve(n); }
@@ -46,6 +47,12 @@ public:
 			object->update(time);
 		}
 	}
+
+    aabb bounding_box() const override { return bbox; }
+
+private:
+    aabb bbox;
+
 };
 
 #endif
