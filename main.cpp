@@ -150,6 +150,39 @@ void earth(SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* texture, int
     cam.render_sequence(hittable_list(rotating_globe), renderer, texture);
 }
 
+void perlin_spheres(SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* texture, int image_width) {
+    int image_height = int(image_width / (16.0 / 9.0));
+
+    hittable_list world;
+
+    auto pertext = make_shared<noise_texture>(4);
+    world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, make_shared<lambertian>(pertext)));
+    world.add(make_shared<sphere>(point3(0, 2, 0), 2, make_shared<lambertian>(pertext)));
+
+    camera cam;
+
+    cam.aspect_ratio = 16.0 / 9.0;
+    cam.image_width = image_width;
+    cam.samples_per_pixel = 2;
+    cam.max_depth = 50;
+
+    cam.vfov = 20;
+    cam.lookfrom = point3(13, 2, 3);
+    cam.lookat = point3(0, 0, 0);
+    cam.vup = vec3(0, 1, 0);
+
+    cam.defocus_angle = 0;
+
+    std::vector<uint8_t> pixels(image_width * image_height * 3);
+
+    cam.render(world, pixels.data());
+
+    SDL_UpdateTexture(texture, nullptr, pixels.data(), image_width * 3);
+    SDL_RenderClear(renderer);
+    SDL_RenderCopy(renderer, texture, nullptr, nullptr);
+    SDL_RenderPresent(renderer);
+}
+
 int main(int argc, char* argv[]) {
 
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -184,10 +217,11 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    switch (3) {
+    switch (4) {
         case 1: bouncing_spheres(window,renderer,texture,image_width);  break;
         case 2: checkered_spheres(window, renderer, texture, image_width); break;
         case 3: earth(window, renderer, texture, image_width); break;
+        case 4: perlin_spheres(window, renderer, texture, image_width); break;
     }
 
     SDL_Event e;
